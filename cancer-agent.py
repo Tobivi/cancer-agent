@@ -157,7 +157,6 @@ def load_models():
             st.info("• Try: pip install --upgrade transformers sentencepiece")
         return None
 
-# --- 2. Setup the Knowledge Base (silently) ---
 @st.cache_resource
 def setup_knowledge_base():
     """
@@ -178,7 +177,6 @@ def setup_knowledge_base():
     except (FileNotFoundError, Exception):
         return None, None, None
 
-# Load models and setup knowledge base
 with st.spinner("🚀 Initializing Cancer Information Chatbot..."):
     try:
         models = load_models()
@@ -251,7 +249,7 @@ def generate_t5_response(question):
         
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Clean and validate response
+        
         cleaned_response = clean_and_validate_response(response)
         
         if cleaned_response is None:
@@ -268,10 +266,10 @@ def generate_dialogpt_response(prompt):
     try:
         tokenizer, model = models["dialogpt"]
         
-        # Retrieve context from knowledge base for DialoGPT
+       
         context = retrieve_context(prompt)
         
-        # Construct enhanced prompt with context
+       
         if context.strip():
             enhanced_prompt = f"Context: {context[:200]}...\n\nUser: {prompt}\nBot:"
         else:
@@ -280,7 +278,7 @@ def generate_dialogpt_response(prompt):
         new_user_input_ids = tokenizer.encode(
             enhanced_prompt + tokenizer.eos_token, 
             return_tensors='pt',
-            max_length=400,  # Increased to accommodate context
+            max_length=400,
             truncation=True
         )
         
@@ -302,7 +300,7 @@ def generate_dialogpt_response(prompt):
             skip_special_tokens=True
         )
         
-        # Clean and validate response
+        
         cleaned_response = clean_and_validate_response(response.strip())
         
         if cleaned_response is None:
@@ -314,11 +312,9 @@ def generate_dialogpt_response(prompt):
         st.error(f"DialoGPT Generation Error: {str(e)}")
         return get_fallback_response("emotional", prompt)
 
-# --- 4. Streamlit App Interface ---
 st.title("Cancer Information Chatbot 🤖")
 st.write("This app uses multiple AI models to understand and respond to you. Choose a generation model from the sidebar")
 
-# Model selection and info in sidebar
 st.sidebar.title("Model Selection")
 selected_model = st.sidebar.radio(
     "Choose the generative model:",
@@ -332,27 +328,23 @@ if selected_model == "T5 Q&A Model":
 else:
     st.sidebar.info("DialoGPT model fine-tuned for cancer conversations. Best for dialogue.")
 
-# Add quality notice
 st.sidebar.markdown("---")
 st.sidebar.warning("⚠️ **Quality Notice**: Responses are automatically filtered for quality and appropriateness. If you see generic responses, the model may be having issues.")
 
-# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat messages from history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# React to user input
 if prompt := st.chat_input("Ask a question or share a thought..."):
-    # Add user message to chat history
+    
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate a response based on the selected model
+    
     with st.chat_message("assistant"):
         with st.spinner("The AI is thinking..."):
             try:
@@ -369,7 +361,7 @@ if prompt := st.chat_input("Ask a question or share a thought..."):
                     else:
                         response = "Thank you for sharing. I am primarily a Q&A model, but please feel free to ask anything about cancer-related topics."
 
-                # Display response
+                
                 st.markdown(response)
                 
             except Exception as e:
@@ -377,15 +369,13 @@ if prompt := st.chat_input("Ask a question or share a thought..."):
                 st.error(f"Error: {str(e)}")
                 st.markdown(response)
 
-    # Add assistant response to chat history
+    
     st.session_state.messages.append({"role": "assistant", "content": response})
 
-# Add clear chat button in sidebar
 if st.sidebar.button("Clear Chat History"):
     st.session_state.messages = []
     st.rerun()
 
-# Add debugging section in sidebar
 with st.sidebar.expander("🔧 Debug Info", expanded=False):
     st.write("Model loaded:", models is not None)
     st.write("System status: Ready")
