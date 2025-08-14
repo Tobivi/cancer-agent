@@ -31,7 +31,7 @@ A comprehensive AI-powered chatbot designed to provide cancer-related informatio
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
+   git clone <repository-url>
    cd cancer-information-chatbot
    ```
 
@@ -49,7 +49,7 @@ A comprehensive AI-powered chatbot designed to provide cancer-related informatio
 
 1. **Start the Streamlit app**
    ```bash
-   streamlit run app.py
+   streamlit run cancer-agent.py
    ```
 
 2. **Access the application**
@@ -77,7 +77,7 @@ A comprehensive AI-powered chatbot designed to provide cancer-related informatio
 
 ```
 cancer-information-chatbot/
-├── app.py                          # Main Streamlit application
+├── cancer-agent.py                          # Main Streamlit application
 ├── requirements.txt                # Python dependencies
 ├── README.md                       # This file
 ├── cancer_comments_annotated.csv   # Knowledge base (optional)
